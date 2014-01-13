@@ -40,16 +40,53 @@
   }
 
   // Converts Steam Marketplace item names into array w/ SQL columns, eg)
-  // result['name'] = '(star) Karambit | Stained (Factory New)'
-  // result['weapon'] = '(star) Karambit'
-  // result['skin'] = 'Stained'
-  // result['exterior'] = 'Factory New'
-  // result['stattrak'] = 0
+  // item['name'] = '(star) Karambit | Stained (Factory New)'
+  // item['weapon'] = '(star) Karambit'
+  // item['skin'] = 'Stained'
+  // item['exterior'] = 'Factory New'
+  // item['stattrak'] = 0
+  // item['special'] = 0
+  // item['souvenir'] = 0
   // \(([\w\s]*?)\)$ matches '(Factory New)'
   // ^(.*)\s\| matches weapon
   // \|\s(.*)\s\( matches skin
   // 
-  function item_name_to_array($item_name) { 
-    
-    
+  function parse_item_name($item_name) { 
+    // If item name contains 'Case', then it is not a weapon,
+    // but a special item which should have mostly null fields.
+    if (strpos($item_name, 'Case') !== false) {
+      $item = array(
+        'name' => $item_name,
+        'weapon' => 'Case',
+        'skin' => $item_name,
+        'exterior' => null,
+        'stattrak' => 0,
+        'special' => 1,
+        'souvenir' => 0,
+      );
+
+      return $item;
+    } else {
+      // could have a bunch of different descriptions, needs to be parsed separately
+      $item_name_string_pattern = '/^(.*)\s\|/';
+      $item_name_string = array();
+      $skin_string_pattern = '/\|\s(.*)\s\(/';
+      $skin_string = array();
+      $exterior_string_pattern = '/\(([\w\s]*?)\)$/';
+      $exterior_string = array();
+
+      preg_match($item_name_string_pattern, $item_name, $item_name_string);
+      preg_match($skin_string_pattern, $item_name, $skin_string);
+      preg_match($exterior_string_pattern, $item_name, $exterior_string);
+
+      $item = array(
+        'item_name' => $item_name_string[1],
+        'skin' => $skin_string[1],
+        'exterior' => $exterior_string[1],
+      );
+
+      return $item;
+    }
+  }
+
 ?>
