@@ -52,9 +52,9 @@
   // \|\s(.*)\s\( matches skin
   // 
   function parse_item_name($item_name) { 
-    // If item name contains 'Case', then it is not a weapon,
+    // If item name doesnt NOT contain '|', then it is not a weapon,
     // but a special item which should have mostly null fields.
-    if (strpos($item_name, 'Case') !== false) {
+    if (strpos($item_name, '|') === false) {
       $item = array(
         'name' => $item_name,
         'weapon' => 'Case',
@@ -63,6 +63,7 @@
         'stattrak' => 0,
         'special' => 1,
         'souvenir' => 0,
+        'star' => 0,
       );
 
       return $item;
@@ -85,7 +86,9 @@
         'exterior' => $exterior_string[1],
       );
 
-      return $item;
+      return(substr($item['item_name'], 0));
+
+      //return $item;
     }
   }
 
